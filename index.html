@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js untuk Live Telemetry -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MQTT.js untuk Live Koneksi ESP32 -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -66,6 +69,16 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #10b981;
         }
+        @keyframes fan-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-fan-fast {
+            animation: fan-spin 0.2s linear infinite;
+        }
+        .animate-fan-slow {
+            animation: fan-spin 0.8s linear infinite;
+        }
     </style>
 </head>
 <body class="overflow-x-hidden custom-scrollbar">
@@ -87,16 +100,16 @@
                 <!-- Desktop Nav -->
                 <nav class="hidden md:flex space-x-1 bg-slate-900/60 p-1.5 rounded-full border border-slate-800">
                     <a href="#hero" class="px-4 py-2 rounded-full text-sm font-medium hover:text-cyan-400 transition-all text-slate-300">Home</a>
-                    <a href="#simulator" class="px-4 py-2 rounded-full text-sm font-medium bg-brand-600/20 text-brand-400 border border-brand-500/30 hover:bg-brand-600/40 transition-all">Sandbox Lab</a>
-                    <a href="#wpt-physics" class="px-4 py-2 rounded-full text-sm font-medium hover:text-cyan-400 transition-all text-slate-300">Sinyal Resonansi</a>
-                    <a href="#briefcase" class="px-4 py-2 rounded-full text-sm font-medium hover:text-cyan-400 transition-all text-slate-300">Info Capstone</a>
-                    <a href="#team" class="px-4 py-2 rounded-full text-sm font-medium hover:text-cyan-400 transition-all text-slate-300">Tim Dev</a>
+                    <a href="#workspace" class="px-4 py-2 rounded-full text-sm font-medium bg-brand-600/20 text-brand-400 border border-brand-500/30 hover:bg-brand-600/40 transition-all">Sandbox Lab</a>
+                    <a href="#physics-lab" class="px-4 py-2 rounded-full text-sm font-medium hover:text-cyan-400 transition-all text-slate-300">Resonansi</a>
+                    <a href="#slides-brief" class="px-4 py-2 rounded-full text-sm font-medium hover:text-cyan-400 transition-all text-slate-300">Dokumen</a>
+                    <a href="#team" class="px-4 py-2 rounded-full text-sm font-medium hover:text-cyan-400 transition-all text-slate-300">Tim</a>
                 </nav>
 
                 <div class="flex items-center space-x-3">
                     <span class="hidden lg:inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                         <span class="w-2 h-2 mr-2 rounded-full bg-cyan-400 animate-ping"></span>
-                        Doc: TA2526.01.099
+                        Doc.ID: TA2526.01.099
                     </span>
                 </div>
             </div>
@@ -121,26 +134,26 @@
                     </div>
                     
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-none text-white">
-                        Smart Multi Receiver Wireless Charging Station
+                        Smart Multi-Coil Wireless Charging Station
                     </h1>
                     <p class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
                         NeoCharge (ELSINTA)
                     </p>
                     <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
-                        Inovasi pengisian daya nirkabel multi-perangkat berbasis <span class="text-cyan-400 font-semibold">Resonant Inductive Coupling</span>, lengkap dengan alokasi cerdas <span class="text-emerald-400 font-semibold">Automatic Power Sharing</span> dan aktivasi lokal <span class="text-cyan-400 font-semibold">Selective Coil Activation</span>.
+                        Inovasi stasiun pengisian daya nirkabel multi-perangkat berbasis <span class="text-cyan-400 font-semibold">Resonant Inductive Coupling</span>. Terintegrasi dengan sistem kendali <span class="text-brand-500 font-semibold">Selective Coil Activation</span>, antarmuka layar TFT lokal, serta sistem monitoring energi jarak jauh berbasis <span class="text-cyan-400 font-semibold">Internet of Things (IoT)</span>.
                     </p>
 
                     <div class="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                        <a href="#simulator" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transform hover:-translate-y-1 transition-all text-center">
+                        <a href="#workspace" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transform hover:-translate-y-1 transition-all text-center">
                             <i class="fa-solid fa-play mr-2"></i>Uji Coba Sandbox Lab
                         </a>
-                        <a href="#wpt-physics" class="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold rounded-xl border border-slate-700 hover:border-slate-500 transition-all text-center">
+                        <a href="#physics-lab" class="w-full sm:w-auto px-8 py-4 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold rounded-xl border border-slate-700 hover:border-slate-500 transition-all text-center">
                             <i class="fa-solid fa-wave-square mr-2"></i>Tuning Frekuensi Resonansi
                         </a>
                     </div>
                 </div>
 
-                <!-- Visual Kanan (Interactive Mockup Cepat) -->
+                <!-- Visual Kanan (Clean & Beautiful Card - No Broken LaTeX) -->
                 <div class="lg:col-span-5 flex justify-center">
                     <div class="relative w-full max-w-[360px] bg-gradient-to-b from-[#12192a] to-[#0f172a] rounded-3xl p-6 border border-cyan-500/30 shadow-2xl">
                         <div class="space-y-4">
@@ -149,12 +162,12 @@
                                 <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             </div>
                             <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center">
-                                <span class="text-xs text-slate-300 font-mono">Daya Puncak</span>
-                                <span class="text-sm font-bold text-emerald-400 font-mono">45 Watt</span>
+                                <span class="text-xs text-slate-300 font-mono">Daya Maksimum</span>
+                                <span class="text-sm font-bold text-emerald-400 font-mono">45 W</span>
                             </div>
                             <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center">
-                                <span class="text-xs text-slate-300 font-mono">Arus Maksimum</span>
-                                <span class="text-sm font-bold text-cyan-400 font-mono">3.75 Ampere</span>
+                                <span class="text-xs text-slate-300 font-mono">Dimensi Box Alat</span>
+                                <span class="text-sm font-bold text-cyan-400 font-mono">35 cm × 30 cm × 7 cm</span>
                             </div>
                             <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex justify-between items-center">
                                 <span class="text-xs text-slate-300 font-mono">Core System</span>
@@ -167,28 +180,52 @@
         </div>
     </section>
 
-    <!-- SIMULATOR INTERAKTIF -->
-    <section id="simulator" class="py-16 bg-[#111c44] border-t border-slate-800">
+    <!-- INTERACTIVE WORKSPACE HUB -->
+    <section id="workspace" class="py-16 bg-[#0f172a] border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-10">
                 <span class="text-brand-500 font-bold font-mono tracking-widest text-xs uppercase bg-brand-500/10 px-3 py-1 rounded-full">Interactive Station Sandbox</span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold mt-3">NeoCharge Simulation Labs</h2>
+                <h2 class="text-3xl sm:text-4xl font-extrabold mt-3">NeoCharge Simulation & IoT Labs</h2>
                 <p class="text-slate-300 mt-2 text-sm">
-                    Simulasikan peletakan perangkat pada stasiun pengisian daya. Log data telemetri akan diperbarui dan dikirim dari simulasi ESP32 secara instan.
+                    Simulasikan peletakan perangkat pada stasiun nirkabel atau hubungkan ke hardware ESP32 fisik secara real-time via MQTT.
                 </p>
+
+                <!-- DUAL MODE TOGGLE CONTROLLER -->
+                <div class="mt-6 inline-flex p-1 bg-slate-950/85 rounded-xl border border-slate-800">
+                    <button id="btnModeSim" onclick="switchOperationMode('sim')" class="px-5 py-2 rounded-lg text-xs font-bold tracking-wider uppercase transition-all bg-brand-600 text-white shadow">
+                        <i class="fa-solid fa-laptop mr-1.5"></i>Demo Simulator
+                    </button>
+                    <button id="btnModeLive" onclick="switchOperationMode('live')" class="px-5 py-2 rounded-lg text-xs font-bold tracking-wider uppercase transition-all text-slate-400 hover:text-slate-200">
+                        <i class="fa-solid fa-wifi mr-1.5"></i>Live ESP32 (MQTT)
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODE BANNER ALERT -->
+            <div id="modeStatusBanner" class="mb-8 p-3 rounded-xl border border-cyan-500/20 bg-cyan-500/5 text-center text-xs font-mono text-cyan-400 flex items-center justify-center gap-2">
+                <span class="h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>Mode Aktif: Demo Simulator. Anda bebas meletakkan ponsel secara interaktif.</span>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
-                <!-- 1. Interactive Control & Station Visual (Col 7) -->
-                <div class="lg:col-span-7 bg-[#1e293b]/50 border border-slate-800 rounded-3xl p-6 glow-cyan">
+                <!-- 1. Interactive Station Visual (Col 7) -->
+                <div class="lg:col-span-7 bg-[#1e293b]/50 border border-slate-800 rounded-3xl p-6 glow-cyan relative overflow-hidden">
+                    <div id="simBlockerMask" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-6 text-center transition-all duration-300 hidden">
+                        <i class="fa-solid fa-lock text-3xl text-slate-500 mb-2"></i>
+                        <h4 class="font-bold text-white text-sm">Kontrol Simulator Terkunci</h4>
+                        <p class="text-xs text-slate-400 max-w-sm mt-1">
+                            Anda berada di mode <strong>Live ESP32 (MQTT)</strong>. Seluruh pergeseran dan peletakan perangkat diatur langsung oleh sensor fisik alat.
+                        </p>
+                    </div>
+
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 mb-6 border-b border-slate-800 gap-4">
                         <div>
                             <h3 class="text-md font-bold text-white flex items-center">
                                 <i class="fa-solid fa-charging-station text-cyan-400 mr-2"></i>
-                                Layout Kumparan Transmitter (Koil)
+                                Layout Fisik Alat (35 cm × 30 cm × 7 cm)
                             </h3>
-                            <p class="text-xs text-slate-400">Ketuk tombol di bawah untuk menaruh ponsel penerima Qi</p>
+                            <p class="text-xs text-slate-400">Tekan tombol pengisian daya pada slot untuk menyimulasikan peletakan hp</p>
                         </div>
                         <div class="flex items-center space-x-3">
                             <label class="text-xs font-semibold text-slate-300 font-mono">Selective Coil:</label>
@@ -199,102 +236,150 @@
                         </div>
                     </div>
 
-                    <!-- TIGA VISUAL PAD WIRELESS -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4 bg-slate-950/80 rounded-2xl p-4 border border-slate-800">
-                        
-                        <!-- Pad 1 -->
-                        <div id="pad1" class="relative group border-2 border-dashed border-slate-700 hover:border-cyan-500/50 rounded-2xl p-4 transition-all duration-300 text-center flex flex-col justify-between min-h-[250px] bg-slate-900/40">
-                            <div class="absolute top-2 left-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Pad A</div>
-                            
-                            <div id="coilWave1" class="hidden absolute inset-0 rounded-2xl bg-cyan-500/5 flex items-center justify-center animate-pulse pointer-events-none">
-                                <div class="w-20 h-20 rounded-full border-4 border-cyan-400/20 animate-ping"></div>
-                            </div>
+                    <!-- REKAYASA BENTUK 3D ALAT NEOCHARGE -->
+                    <div class="bg-gradient-to-b from-slate-900 to-slate-950 rounded-3xl p-6 border border-slate-800 shadow-2xl relative">
+                        <!-- Tanda Informasi Ukuran -->
+                        <div class="absolute -top-3 left-6 bg-slate-800 text-slate-300 border border-slate-700 px-3 py-0.5 rounded text-[10px] font-mono">
+                            Panjang: 35 cm
+                        </div>
+                        <div class="absolute top-1/2 -right-3 -translate-y-1/2 rotate-90 bg-slate-800 text-slate-300 border border-slate-700 px-3 py-0.5 rounded text-[10px] font-mono">
+                            Lebar: 30 cm
+                        </div>
 
-                            <div class="my-auto flex flex-col items-center">
-                                <div id="phoneVisual1" class="transition-all duration-300 transform scale-90 opacity-40">
-                                    <div class="w-16 h-28 bg-slate-800 rounded-lg border-2 border-slate-600 relative overflow-hidden flex flex-col justify-between p-1.5 shadow-lg">
-                                        <div class="w-8 h-0.5 bg-slate-600 rounded-full mx-auto"></div>
-                                        <div class="text-center my-auto">
-                                            <i class="fa-solid fa-mobile-screen text-2xl text-slate-500"></i>
-                                            <p id="phoneBrand1" class="text-[8px] text-slate-400 font-mono mt-1">iPhone 15 Pro</p>
-                                        </div>
-                                        <div class="flex justify-between items-center text-[7px] font-mono">
-                                            <span id="phoneBattLevel1">20%</span>
-                                            <i class="fa-solid fa-battery-quarter text-slate-400"></i>
+                        <!-- Bagian Atas Alat: Kumparan & TFT Screen -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-6">
+                            <!-- Pad A -->
+                            <div id="pad1" class="relative border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-4 transition-all duration-300 text-center flex flex-col justify-between min-h-[220px] bg-slate-950/60">
+                                <div class="absolute top-2 left-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Pad A</div>
+                                <div id="coilWave1" class="hidden absolute inset-0 rounded-2xl bg-cyan-500/5 flex items-center justify-center animate-pulse pointer-events-none">
+                                    <div class="w-16 h-16 rounded-full border-4 border-cyan-400/20 animate-ping"></div>
+                                </div>
+                                <div class="my-auto flex flex-col items-center">
+                                    <div id="phoneVisual1" class="transition-all duration-300 transform scale-90 opacity-30">
+                                        <div class="w-14 h-24 bg-slate-900 rounded-lg border-2 border-slate-700 relative overflow-hidden flex flex-col justify-between p-1 shadow-lg">
+                                            <div class="w-6 h-0.5 bg-slate-700 rounded-full mx-auto"></div>
+                                            <div class="text-center my-auto">
+                                                <i class="fa-solid fa-mobile-screen text-xl text-slate-600"></i>
+                                                <p id="phoneBrand1" class="text-[7px] text-slate-400 font-mono mt-0.5">iPhone 15 Pro</p>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[6px] font-mono">
+                                                <span id="phoneBattLevel1">20%</span>
+                                                <i class="fa-solid fa-battery-quarter text-slate-500"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="mt-2">
-                                <button id="btnAction1" onclick="togglePhonePlacement(1)" class="w-full py-1 px-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-all">
-                                    Letakkan HP
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Pad 2 -->
-                        <div id="pad2" class="relative group border-2 border-dashed border-slate-700 hover:border-cyan-500/50 rounded-2xl p-4 transition-all duration-300 text-center flex flex-col justify-between min-h-[250px] bg-slate-900/40">
-                            <div class="absolute top-2 left-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Pad B</div>
-                            
-                            <div id="coilWave2" class="hidden absolute inset-0 rounded-2xl bg-cyan-500/5 flex items-center justify-center animate-pulse pointer-events-none">
-                                <div class="w-20 h-20 rounded-full border-4 border-cyan-400/20 animate-ping"></div>
-                            </div>
-
-                            <div class="my-auto flex flex-col items-center">
-                                <div id="phoneVisual2" class="transition-all duration-300 transform scale-90 opacity-40">
-                                    <div class="w-16 h-28 bg-slate-800 rounded-lg border-2 border-slate-600 relative overflow-hidden flex flex-col justify-between p-1.5 shadow-lg">
-                                        <div class="w-8 h-0.5 bg-slate-600 rounded-full mx-auto"></div>
-                                        <div class="text-center my-auto">
-                                            <i class="fa-solid fa-mobile-screen text-2xl text-slate-500"></i>
-                                            <p id="phoneBrand2" class="text-[8px] text-slate-400 font-mono mt-1">Samsung S24</p>
-                                        </div>
-                                        <div class="flex justify-between items-center text-[7px] font-mono">
-                                            <span id="phoneBattLevel2">50%</span>
-                                            <i class="fa-solid fa-battery-half text-slate-400"></i>
-                                        </div>
-                                    </div>
+                                <div class="mt-2">
+                                    <button id="btnAction1" onclick="togglePhonePlacement(1)" class="w-full py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[11px] font-semibold transition-all">
+                                        Letakkan HP
+                                    </button>
                                 </div>
                             </div>
 
-                            <div class="mt-2">
-                                <button id="btnAction2" onclick="togglePhonePlacement(2)" class="w-full py-1 px-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-all">
-                                    Letakkan HP
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Pad 3 -->
-                        <div id="pad3" class="relative group border-2 border-dashed border-slate-700 hover:border-cyan-500/50 rounded-2xl p-4 transition-all duration-300 text-center flex flex-col justify-between min-h-[250px] bg-slate-900/40">
-                            <div class="absolute top-2 left-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Pad C</div>
-                            
-                            <div id="coilWave3" class="hidden absolute inset-0 rounded-2xl bg-cyan-500/5 flex items-center justify-center animate-pulse pointer-events-none">
-                                <div class="w-20 h-20 rounded-full border-4 border-cyan-400/20 animate-ping"></div>
-                            </div>
-
-                            <div class="my-auto flex flex-col items-center">
-                                <div id="phoneVisual3" class="transition-all duration-300 transform scale-90 opacity-40">
-                                    <div class="w-16 h-28 bg-slate-800 rounded-lg border-2 border-slate-600 relative overflow-hidden flex flex-col justify-between p-1.5 shadow-lg">
-                                        <div class="w-8 h-0.5 bg-slate-600 rounded-full mx-auto"></div>
-                                        <div class="text-center my-auto">
-                                            <i class="fa-solid fa-mobile-screen text-2xl text-slate-500"></i>
-                                            <p id="phoneBrand3" class="text-[8px] text-slate-400 font-mono mt-1">Google Pixel 8</p>
-                                        </div>
-                                        <div class="flex justify-between items-center text-[7px] font-mono">
-                                            <span id="phoneBattLevel3">10%</span>
-                                            <i class="fa-solid fa-battery-empty text-slate-400"></i>
+                            <!-- Pad B (Tengah) -->
+                            <div id="pad2" class="relative border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-4 transition-all duration-300 text-center flex flex-col justify-between min-h-[220px] bg-slate-950/60">
+                                <div class="absolute top-2 left-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Pad B</div>
+                                <div id="coilWave2" class="hidden absolute inset-0 rounded-2xl bg-cyan-500/5 flex items-center justify-center animate-pulse pointer-events-none">
+                                    <div class="w-16 h-16 rounded-full border-4 border-cyan-400/20 animate-ping"></div>
+                                </div>
+                                <div class="my-auto flex flex-col items-center">
+                                    <div id="phoneVisual2" class="transition-all duration-300 transform scale-90 opacity-30">
+                                        <div class="w-14 h-24 bg-slate-900 rounded-lg border-2 border-slate-700 relative overflow-hidden flex flex-col justify-between p-1 shadow-lg">
+                                            <div class="w-6 h-0.5 bg-slate-700 rounded-full mx-auto"></div>
+                                            <div class="text-center my-auto">
+                                                <i class="fa-solid fa-mobile-screen text-xl text-slate-600"></i>
+                                                <p id="phoneBrand2" class="text-[7px] text-slate-400 font-mono mt-0.5">Samsung S24</p>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[6px] font-mono">
+                                                <span id="phoneBattLevel2">50%</span>
+                                                <i class="fa-solid fa-battery-half text-slate-500"></i>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="mt-2">
+                                    <button id="btnAction2" onclick="togglePhonePlacement(2)" class="w-full py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[11px] font-semibold transition-all">
+                                        Letakkan HP
+                                    </button>
+                                </div>
                             </div>
 
-                            <div class="mt-2">
-                                <button id="btnAction3" onclick="togglePhonePlacement(3)" class="w-full py-1 px-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-all">
-                                    Letakkan HP
-                                </button>
+                            <!-- Pad C -->
+                            <div id="pad3" class="relative border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-4 transition-all duration-300 text-center flex flex-col justify-between min-h-[220px] bg-slate-950/60">
+                                <div class="absolute top-2 left-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">Pad C</div>
+                                <div id="coilWave3" class="hidden absolute inset-0 rounded-2xl bg-cyan-500/5 flex items-center justify-center animate-pulse pointer-events-none">
+                                    <div class="w-16 h-16 rounded-full border-4 border-cyan-400/20 animate-ping"></div>
+                                </div>
+                                <div class="my-auto flex flex-col items-center">
+                                    <div id="phoneVisual3" class="transition-all duration-300 transform scale-90 opacity-30">
+                                        <div class="w-14 h-24 bg-slate-900 rounded-lg border-2 border-slate-700 relative overflow-hidden flex flex-col justify-between p-1 shadow-lg">
+                                            <div class="w-6 h-0.5 bg-slate-700 rounded-full mx-auto"></div>
+                                            <div class="text-center my-auto">
+                                                <i class="fa-solid fa-mobile-screen text-xl text-slate-600"></i>
+                                                <p id="phoneBrand3" class="text-[7px] text-slate-400 font-mono mt-0.5">Google Pixel 8</p>
+                                            </div>
+                                            <div class="flex justify-between items-center text-[6px] font-mono">
+                                                <span id="phoneBattLevel3">10%</span>
+                                                <i class="fa-solid fa-battery-empty text-slate-500"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button id="btnAction3" onclick="togglePhonePlacement(3)" class="w-full py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[11px] font-semibold transition-all">
+                                        Letakkan HP
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- LAYAR TFT LCD 3.5 INCH INTEGRAL (Sesuai EL3) -->
+                        <div class="bg-slate-950 border-2 border-slate-800 rounded-xl p-3 max-w-sm mx-auto shadow-inner">
+                            <div class="flex justify-between items-center border-b border-slate-800 pb-1 mb-2">
+                                <span class="text-[8px] font-mono text-emerald-400 tracking-widest"><i class="fa-solid fa-desktop"></i> LOCAL_TFT_ILI9488</span>
+                                <span class="text-[7px] font-mono text-slate-500">RES 480×320</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-300">
+                                <div class="bg-slate-900 p-1.5 rounded border border-slate-800/80">
+                                    <p class="text-[8px] text-slate-500">VOLTAGE:</p>
+                                    <p class="font-bold text-white"><span id="tftVolts">12.00</span> V</p>
+                                </div>
+                                <div class="bg-slate-900 p-1.5 rounded border border-slate-800/80">
+                                    <p class="text-[8px] text-slate-500">TOTAL CURRENT:</p>
+                                    <p class="font-bold text-cyan-400"><span id="tftAmps">0.00</span> A</p>
+                                </div>
+                                <div class="bg-slate-900 p-1.5 rounded border border-slate-800/80">
+                                    <p class="text-[8px] text-slate-500">INPUT POWER:</p>
+                                    <p class="font-bold text-emerald-400"><span id="tftWatts">0.00</span> W</p>
+                                </div>
+                                <div class="bg-slate-900 p-1.5 rounded border border-slate-800/80">
+                                    <p class="text-[8px] text-slate-500">TEMPERATURE:</p>
+                                    <p class="font-bold text-amber-500"><span id="tftTemp">28.50</span> °C</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sisi Depan Box (Tebal 7 cm) & Animasi 3 Kipas DC 12V (Selective Cooling) -->
+                        <div class="mt-6 pt-4 border-t border-slate-800/80">
+                            <div class="flex justify-between items-center text-slate-500 text-[9px] font-mono mb-2">
+                                <span>Tampak Depan (Tebal: 7 cm)</span>
+                                <span>Kipas Penyaring Pad Aktif (Selective Cooling)</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-slate-950 rounded-xl p-3 border border-slate-800 flex flex-col items-center justify-center">
+                                    <div id="fanIcon1" class="text-xl text-slate-600 transition-all duration-300"><i class="fa-solid fa-fan"></i></div>
+                                    <span class="text-[8px] font-mono text-slate-500 mt-1">FAN A (PAD 1)</span>
+                                </div>
+                                <div class="bg-slate-950 rounded-xl p-3 border border-slate-800 flex flex-col items-center justify-center">
+                                    <div id="fanIcon2" class="text-xl text-slate-600 transition-all duration-300"><i class="fa-solid fa-fan"></i></div>
+                                    <span class="text-[8px] font-mono text-slate-500 mt-1">FAN B (PAD 2)</span>
+                                </div>
+                                <div class="bg-slate-950 rounded-xl p-3 border border-slate-800 flex flex-col items-center justify-center">
+                                    <div id="fanIcon3" class="text-xl text-slate-600 transition-all duration-300"><i class="fa-solid fa-fan"></i></div>
+                                    <span class="text-[8px] font-mono text-slate-500 mt-1">FAN C (PAD 3)</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- PHYSICS CONTROL SLIDERS -->
@@ -325,9 +410,9 @@
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                                 </span>
-                                <h3 class="font-bold text-white text-sm">ESP32 IoT Telemetry Monitor</h3>
+                                <h3 id="panelTitle" class="font-bold text-white text-sm">ESP32 IoT Telemetry Monitor</h3>
                             </div>
-                            <span class="text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded">MQTT Link</span>
+                            <span id="commMethodBadge" class="text-[10px] font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded">SIM MODE</span>
                         </div>
 
                         <!-- LIVE METRICS GRID -->
@@ -354,11 +439,11 @@
                             </div>
                         </div>
 
-                        <!-- SUHU & CHART -->
+                        <!-- SUHU & STATUS -->
                         <div class="p-3 mb-4 rounded-xl bg-slate-950/80 border border-slate-800 flex justify-between items-center">
                             <div>
                                 <span class="text-[9px] text-slate-400 font-mono block">SUHU TRANSMITTER</span>
-                                <span id="telemetryTemp" class="text-md font-bold text-white font-mono">31.4 <span class="text-xs">°C</span></span>
+                                <span id="telemetryTemp" class="text-md font-bold text-white font-mono">28.5 <span class="text-xs">°C</span></span>
                             </div>
                             <div id="thermalStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
                                 STATUS: AMAN
@@ -371,18 +456,41 @@
                         </div>
                     </div>
 
-                    <!-- ESP32 SERI MON TERM SIMULATOR -->
+                    <!-- MQTT LIVE CONFIG PANEL -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl">
+                        <h4 class="text-xs font-bold font-mono text-cyan-400 mb-3 flex items-center gap-1.5">
+                            <i class="fa-solid fa-sliders"></i> MQTT Configuration Settings
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="text-[10px] font-mono text-slate-400 block mb-1">Broker WSS Host</label>
+                                <input id="mqttHost" type="text" value="broker.hivemq.com" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs font-mono text-white focus:border-cyan-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-mono text-slate-400 block mb-1">WSS Port</label>
+                                <input id="mqttPort" type="number" value="8884" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs font-mono text-white focus:border-cyan-400 focus:outline-none">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-[10px] font-mono text-slate-400 block mb-1">Subscription Topic (JSON)</label>
+                            <input id="mqttTopic" type="text" value="neocharge/telemetry" class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs font-mono text-white focus:border-cyan-400 focus:outline-none">
+                        </div>
+                        <button onclick="reconnectMQTTReal()" class="w-full py-1.5 bg-cyan-600 hover:bg-cyan-700 text-slate-950 font-bold rounded-lg text-xs tracking-wider transition-all">
+                            Apply & Connect MQTT Broker
+                        </button>
+                    </div>
+
+                    <!-- ESP32 SERIAL MONITOR TERMINAL SIMULATOR -->
                     <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-[11px]">
                         <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
                             <span class="text-slate-400 text-xs flex items-center">
-                                <span class="h-2 w-2 rounded-full bg-cyan-400 mr-2 animate-pulse"></span>
+                                <span id="terminalStatusDot" class="h-2 w-2 rounded-full bg-cyan-400 mr-2"></span>
                                 ESP32 Serial Monitor COM4
                             </span>
                             <span class="text-[9px] text-slate-600">115200 bps</span>
                         </div>
                         <div id="serialTerminal" class="h-28 overflow-y-auto space-y-1 text-slate-400 custom-scrollbar select-none">
                             <p class="text-cyan-400">[SYSTEM] Initializing NeoCharge ESP32 Core...</p>
-                            <p class="text-emerald-400">[MQTT] Connected to broker.hivemq.com:1883</p>
                             <p class="text-slate-500">[SENSOR] INA219 current sensor detected.</p>
                         </div>
                     </div>
@@ -393,14 +501,24 @@
     </section>
 
     <!-- WPT PHYSICS LAB (TUNER FREKUENSI) -->
-    <section id="wpt-physics" class="py-16 bg-[#0f172a] border-t border-slate-800">
+    <section id="physics-lab" class="py-16 bg-[#111c44] border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-10">
                 <span class="text-cyan-400 font-bold font-mono tracking-widest text-xs uppercase bg-cyan-500/10 px-3 py-1 rounded-full">Sinyal Elektromagnetik</span>
                 <h2 class="text-3xl font-extrabold mt-3 text-white">Tuning Frekuensi Resonansi</h2>
                 <p class="text-slate-300 mt-2 text-sm">
-                    Metode *Strongly-Coupled Magnetic Resonance* bekerja maksimal jika pemancar dan penerima berosilasi pada frekuensi yang sama. Geser frekuensi di bawah ini untuk mengunci resonansi!
+                    Metode Strongly-Coupled Magnetic Resonance bekerja maksimal jika pemancar dan penerima berosilasi pada frekuensi yang sama. Sesuai standar Qi, sistem akan berosilasi otomatis mencari titik kecocokan resonansi.
                 </p>
+
+                <!-- AUTO TUNING MODE SWITCHER -->
+                <div class="mt-4 inline-flex p-1 bg-slate-950/80 border border-slate-800 rounded-xl text-xs">
+                    <button id="btnAutoTune" onclick="setTuningMode(true)" class="px-4 py-1.5 rounded-lg font-bold font-mono uppercase bg-emerald-600 text-white transition-all">
+                        <i class="fa-solid fa-magic mr-1"></i> Auto-Tuning (Qi Standard)
+                    </button>
+                    <button id="btnManualTune" onclick="setTuningMode(false)" class="px-4 py-1.5 rounded-lg font-bold font-mono uppercase text-slate-400 hover:text-slate-200 transition-all">
+                        Manual Slider
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -413,8 +531,8 @@
                                 <label class="text-xs text-slate-300 font-semibold">Tuning Frekuensi Driver</label>
                                 <span id="freqVal" class="text-sm font-bold text-cyan-400 font-mono">110 kHz</span>
                             </div>
-                            <input id="freqSlider" type="range" min="110" max="205" value="110" oninput="drawResonantWaves()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
-                            <p class="text-[10px] text-slate-500 mt-1">Frekuensi operasi standar nirkabel Qi berkisar antara 110 kHz hingga 205 kHz.</p>
+                            <input id="freqSlider" type="range" min="110" max="205" value="110" oninput="manualTuningAdjust()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-not-allowed opacity-50 accent-cyan-400" disabled>
+                            <p id="tunerExplanation" class="text-[10px] text-slate-400 mt-1">Sistem sedang beroperasi pada mode **Auto-Tuning**. Saat HP diletakkan, koil transmitter akan menyesuaikan frekuensi secara otomatis hingga resonansi mengunci di 145 kHz.</p>
                         </div>
 
                         <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800/80 space-y-2">
@@ -429,7 +547,7 @@
                         </div>
 
                         <p class="text-xs text-slate-400 leading-relaxed">
-                            Bila frekuensi Anda disetel tepat pada <span class="text-white font-bold">145 kHz</span>, transfer daya nirkabel akan mengalami puncak amplifikasi resonansi maksimal.
+                            Bila frekuensi driver Anda disetel tepat pada 145 kHz (baik manual maupun otomatis), transfer daya nirkabel akan mengalami puncak amplifikasi resonansi maksimal.
                         </p>
                     </div>
                 </div>
@@ -445,25 +563,28 @@
         </div>
     </section>
 
-    <!-- DOKUMEN RINGKAS TERINTEGRASI (SLIDERS-STLYE) -->
-    <section id="briefcase" class="py-16 bg-[#111c44] border-t border-slate-800">
+    <!-- SLIDES DOKUMEN RINGKAS TERINTEGRASI -->
+    <section id="slides-brief" class="py-16 bg-[#0f172a] border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-10">
                 <span class="text-emerald-400 font-bold font-mono tracking-widest text-xs uppercase bg-emerald-500/10 px-3 py-1 rounded-full">Academic Showcase</span>
                 <h2 class="text-3xl font-black mt-3 text-white">Ringkasan Dokumen Capstone</h2>
                 <p class="text-slate-300 mt-2 text-sm">
-                    Poin penting pengerjaan teknis berdasarkan usulan proyek (EL1) dan kajian pustaka (EL2).
+                    Ringkasan poin teknis penyusunan berkas perancangan ("EL1 Rev 1", "EL2 Rev", dan "EL3 Rev").
                 </p>
             </div>
 
             <!-- TAB CONTROLLER -->
             <div class="flex justify-center mb-8">
                 <div class="bg-slate-900 border border-slate-800 p-1 rounded-xl inline-flex space-x-1">
-                    <button onclick="switchTab('el1')" id="tabBtn-el1" class="px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md">
-                        Usulan Proyek (EL-1 Rev 1.pdf)
+                    <button onclick="switchTab('el1')" id="tabBtn-el1" class="px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md">
+                        Usulan Proyek (EL-1)
                     </button>
-                    <button onclick="switchTab('el2')" id="tabBtn-el2" class="px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200">
-                        Kajian & Standar (EL 2 Rev.pdf)
+                    <button onclick="switchTab('el2')" id="tabBtn-el2" class="px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200">
+                        Kajian & Standar (EL-2)
+                    </button>
+                    <button onclick="switchTab('el3')" id="tabBtn-el3" class="px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200">
+                        Desain & Pengujian (EL-3)
                     </button>
                 </div>
             </div>
@@ -473,23 +594,23 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-[#12192a] p-5 rounded-2xl border border-slate-800">
                         <div class="text-emerald-400 text-lg mb-2"><i class="fa-solid fa-circle-exclamation"></i></div>
-                        <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-2">Kebutuhan Riil</h4>
+                        <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-2">Masalah Riil</h4>
                         <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Banyak stasiun pengisi nirkabel komersial gagal mentransfer daya secara stabil ketika beberapa ponsel diletakkan bersamaan, memicu turunnya tegangan suplai dan meningkatkan akumulasi suhu.
+                            Banyak stasiun pengisi nirkabel publik belum dilengkapi dengan sistem pemantauan terintegrasi, menyulitkan proses pemeliharaan.
                         </p>
                     </div>
                     <div class="bg-[#12192a] p-5 rounded-2xl border border-slate-800">
                         <div class="text-cyan-400 text-lg mb-2"><i class="fa-solid fa-bullseye"></i></div>
                         <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-2">Tujuan Utama</h4>
                         <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Membangun prototipe nirkabel cerdas yang mengalokasikan arus secara adaptif (Power Sharing) dan memutus daya pada area pad idle (Selective Activation).
+                            Membangun stasiun wireless nirkabel pintar multi-slot dengan pemantauan IoT real-time.
                         </p>
                     </div>
                     <div class="bg-[#12192a] p-5 rounded-2xl border border-slate-800">
                         <div class="text-emerald-400 text-lg mb-2"><i class="fa-solid fa-box-open"></i></div>
                         <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-2">Rencana Luaran</h4>
                         <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Prototipe fisik NeoCharge, sirkuit driver kumparan nirkabel, manual penggunaan keselamatan kelistrikan, dan web dashboard pantauan telemetri.
+                            Prototipe fisik NeoCharge, dashboard monitoring berbasis web, dan poster ilmiah.
                         </p>
                     </div>
                 </div>
@@ -502,22 +623,82 @@
                         <div class="text-cyan-400 text-lg mb-2"><i class="fa-solid fa-scale-balanced"></i></div>
                         <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-2">Analisis Gap</h4>
                         <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Solusi komersial umumnya bertumpu pada alokasi daya pasif tetap (*fixed distribution*), sedangkan NeoCharge mengembangkan alokasi dinamis aktif berbasis kontrol pembacaan sensor arus sirkuit secara real-time.
+                            Solusi komersial umumnya tertumpu pada alokasi daya pasif tetap (fixed distribution), sedangkan NeoCharge mengembangkan alokasi dinamis aktif berbasis kontrol pembacaan sensor arus sirkuit secara real-time.
                         </p>
                     </div>
                     <div class="bg-[#12192a] p-5 rounded-2xl border border-slate-800">
                         <div class="text-emerald-400 text-lg mb-2"><i class="fa-solid fa-shield-halved"></i></div>
                         <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-2">Standar Keamanan</h4>
                         <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Mengikuti pedoman standardisasi internasional **Qi Power Standard**, **IEC 62368-1** untuk proteksi sirkuit kelistrikan, dan pembatasan paparan medan elektromagnetik **IEC 62311**.
+                            Mengikuti pedoman standardisasi internasional Qi Power Standard, IEC 62368-1 untuk proteksi sirkuit kelistrikan, dan pembatasan paparan medan elektromagnetik IEC 62311.
                         </p>
                     </div>
                     <div class="bg-[#12192a] p-5 rounded-2xl border border-slate-800">
                         <div class="text-cyan-400 text-lg mb-2"><i class="fa-solid fa-landmark"></i></div>
                         <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-2">Kepatuhan Regulasi</h4>
                         <p class="text-[11px] text-slate-400 leading-relaxed">
-                            Penggunaan pita radio nirkabel ESP32 berfrekuensi 2.4 GHz disesuaikan dengan regulasi komisi **SDPPI Kominfo** serta pedoman operasional K3 di laboratorium Teknik Elektro ITERA.
+                            Penggunaan pita radio nirkabel ESP32 berfrekuensi 2.4 GHz disesuaikan dengan regulasi komisi SDPPI Kominfo serta pedoman operasional K3 di laboratorium Teknik Elektro ITERA.
                         </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTAINER DOKUMEN EL3 (SPESIFIKASI DESIGN & PENGUJIAN) -->
+            <div id="tabContent-el3" class="space-y-6 max-w-5xl mx-auto hidden">
+                <div class="bg-[#12192a] p-6 rounded-2xl border border-slate-800">
+                    <h4 class="font-bold text-white text-xs uppercase font-mono tracking-wider mb-4 border-b border-slate-800 pb-2 flex justify-between">
+                        <span>Spesifikasi Hardware & Sirkuit (EL-3)</span>
+                        <span class="text-cyan-400 font-bold">35 cm × 30 cm × 7 cm</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] leading-relaxed text-slate-400">
+                        <ul class="space-y-1.5 list-disc pl-4">
+                            <li><strong>Mikrokontroler:</strong> ESP32 DevKit V1 (Dual-Core Xtensa LX6 32-bit).</li>
+                            <li><strong>Sirkuit Sensor:</strong> 3x Sensor Arus/Tegangan INA219 (Resolusi ADC 12-bit via I²C).</li>
+                            <li><strong>Termosensor:</strong> DS18B20 (1-Wire, akurasi ±0.5°C).</li>
+                        </ul>
+                        <ul class="space-y-1.5 list-disc pl-4">
+                            <li><strong>Aktivator Koil:</strong> N-Channel MOSFET IRFZ44N (V_DS = 55 V, I_D = 49 A).</li>
+                            <li><strong>Catu Daya Utama:</strong> Buck Converter LM2596 (Menurunkan tegangan input ke 5 V).</li>
+                            <li><strong>Layar Lokal:</strong> TFT LCD ILI9488 3.5 Inch (480×320 px via SPI).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tabel Pengujian (Metrologi EL3) -->
+                <div class="bg-slate-950 rounded-2xl p-4 border border-slate-800">
+                    <h4 class="text-xs font-mono text-slate-300 mb-3 uppercase tracking-wider">Kriteria Keberhasilan Pengujian Fisik & Integrasi</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-left text-[10px] font-mono text-slate-400">
+                            <thead class="bg-slate-900 text-slate-300">
+                                <tr>
+                                    <th class="px-4 py-2 border-b border-slate-800">No.</th>
+                                    <th class="px-4 py-2 border-b border-slate-800">Parameter Pengujian</th>
+                                    <th class="px-4 py-2 border-b border-slate-800">Target Batas Keberhasilan (Sesuai EL3)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="px-4 py-2 font-bold text-cyan-400">1</td>
+                                    <td class="px-4 py-2 text-slate-300">Pengujian Keluaran Tegangan (Output Voltage)</td>
+                                    <td class="px-4 py-2">4.8 V ≤ V_out ≤ 5.2 V</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 font-bold text-cyan-400">2</td>
+                                    <td class="px-4 py-2 text-slate-300">Akurasi Sensor Suhu (DS18B20)</td>
+                                    <td class="px-4 py-2">Penyimpangan ≤ 0.5°C dari referensi standar</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 font-bold text-cyan-400">3</td>
+                                    <td class="px-4 py-2 text-slate-300">Konsumsi Arus Keadaan Diam (Idle State)</td>
+                                    <td class="px-4 py-2">Konsumsi arus diam total ≤ 50 mA</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 font-bold text-cyan-400">4</td>
+                                    <td class="px-4 py-2 text-slate-300">Keandalan Transmisi Data Wi-Fi</td>
+                                    <td class="px-4 py-2">Tingkat pengiriman sukses data IoT ≥ 98%</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -526,7 +707,7 @@
     </section>
 
     <!-- TIM & AKADEMIK -->
-    <section id="team" class="py-16 bg-[#0f172a] text-white">
+    <section id="team" class="py-16 bg-[#111c44] text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-12">
                 <span class="text-cyan-400 font-bold font-mono tracking-widest text-xs uppercase bg-cyan-500/10 px-3 py-1 rounded-full">Development Team</span>
@@ -635,10 +816,20 @@
         let selectiveCoilFeature = true;
         let alignmentFactor = 100; // range 30 - 100 %
         let resonantFreq = 110; // kHz (slider)
+        let autoTuningMode = true; // Mode Auto Tuning aktif by default
+        let operationMode = 'sim'; // 'sim' atau 'live'
+
+        // Simpan nilai dasar tanpa fluktuasi
+        let baseVolts = 12.00;
+        let baseAmps = 0.00;
+        let baseWatts = 0.00;
+        let baseTemp = 28.50;
+        let baseEff = 0.0;
 
         // Inisialisasi Grafik Chart.js
         let telemetryChart = null;
         let dataIndex = 0;
+        let mqttClient = null;
 
         // Terminal Log Simulator Helper
         function logToTerminal(message, type = 'info') {
@@ -682,7 +873,215 @@
                 oscillator.start(audioCtx.currentTime);
                 oscillator.stop(audioCtx.currentTime + duration);
             } catch (e) {
-                // Browser blocks audio context sometimes before interaction
+                // Browser blocks audio context sometimes
+            }
+        }
+
+        // SWAP MODE: SIMULATOR VS LIVE MQTT
+        function switchOperationMode(mode) {
+            operationMode = mode;
+            const btnSim = document.getElementById('btnModeSim');
+            const btnLive = document.getElementById('btnModeLive');
+            const banner = document.getElementById('modeStatusBanner');
+            const simBlocker = document.getElementById('simBlockerMask');
+            const methodBadge = document.getElementById('commMethodBadge');
+
+            if (mode === 'sim') {
+                btnSim.className = "px-5 py-2 rounded-lg text-xs font-bold tracking-wider uppercase transition-all bg-brand-600 text-white shadow";
+                btnLive.className = "px-5 py-2 rounded-lg text-xs font-bold tracking-wider uppercase transition-all text-slate-400 hover:text-slate-200";
+                banner.className = "mb-8 p-3 rounded-xl border border-cyan-500/20 bg-cyan-500/5 text-center text-xs font-mono text-cyan-400 flex items-center justify-center gap-2";
+                banner.innerHTML = `<span class="h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span><span>Mode Aktif: Demo Simulator. Anda bebas meletakkan ponsel secara interaktif.</span>`;
+                simBlocker.classList.add('hidden');
+                methodBadge.innerText = "SIM MODE";
+                logToTerminal("[SYSTEM] Switched to local offline simulator mode.", "warn");
+                playHapticBeep(440, 0.15);
+                calculateSimulator();
+            } else {
+                btnLive.className = "px-5 py-2 rounded-lg text-xs font-bold tracking-wider uppercase transition-all bg-brand-600 text-white shadow";
+                btnSim.className = "px-5 py-2 rounded-lg text-xs font-bold tracking-wider uppercase transition-all text-slate-400 hover:text-slate-200";
+                banner.className = "mb-8 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-center text-xs font-mono text-emerald-400 flex items-center justify-center gap-2";
+                banner.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span><span>Mode Aktif: Live ESP32 (MQTT). Dashboard dikunci untuk data sensor fisik sirkuit.</span>`;
+                simBlocker.classList.remove('hidden');
+                methodBadge.innerText = "MQTT WSS";
+                logToTerminal("[SYSTEM] Switched to Live ESP32 MQTT connection mode.", "success");
+                playHapticBeep(587.33, 0.2);
+                connectMQTTReal();
+            }
+        }
+
+        // MQTT CLIENT CONNECTION MANAGER (GITHUB PAGES COMPATIBLE)
+        function connectMQTTReal() {
+            if (mqttClient) {
+                try { mqttClient.end(); } catch(err) {}
+            }
+
+            const host = document.getElementById('mqttHost').value.trim();
+            const port = parseInt(document.getElementById('mqttPort').value);
+            const topic = document.getElementById('mqttTopic').value.trim();
+            const clientId = 'neocharge_client_' + Math.random().toString(16).substr(2, 8);
+
+            logToTerminal(`[MQTT] Connecting to wss://${host}:${port}/mqtt ...`, "info");
+            document.getElementById('terminalStatusDot').className = "h-2 w-2 rounded-full bg-amber-400 mr-2 animate-pulse";
+
+            const options = {
+                clientId: clientId,
+                keepalive: 60,
+                clean: true,
+                connectTimeout: 4000,
+                reconnectPeriod: 4000
+            };
+
+            try {
+                mqttClient = mqtt.connect(`wss://${host}:${port}/mqtt`, options);
+
+                mqttClient.on('connect', () => {
+                    logToTerminal("[MQTT] Connected to Secure WebSockets Broker!", "success");
+                    document.getElementById('terminalStatusDot').className = "h-2 w-2 rounded-full bg-emerald-400 mr-2 animate-pulse";
+                    mqttClient.subscribe(topic, (err) => {
+                        if (!err) {
+                            logToTerminal(`[MQTT] Subscribed to topic: "${topic}" successfully.`, "success");
+                        } else {
+                            logToTerminal(`[MQTT] Subscription failed: ${err.message}`, "error");
+                        }
+                    });
+                });
+
+                mqttClient.on('message', (rcvTopic, payload) => {
+                    if (operationMode !== 'live') return; // Abaikan data jika sedang di mode simulasi
+                    
+                    try {
+                        const jsonPayload = JSON.parse(payload.toString());
+                        logToTerminal(`[MQTT] Payload Rcv: ${payload.toString()}`, "info");
+                        
+                        // Perbarui data telemetry real-time
+                        const watts = parseFloat(jsonPayload.w || 0);
+                        const temp = parseFloat(jsonPayload.temp || 28.5);
+                        const volts = parseFloat(jsonPayload.v || 12);
+                        const amps = parseFloat(jsonPayload.a || 0);
+                        const eff = parseFloat(jsonPayload.eff || 0);
+
+                        if (jsonPayload.hasOwnProperty('pad1')) updatePadVisuals(1, !!jsonPayload.pad1);
+                        if (jsonPayload.hasOwnProperty('pad2')) updatePadVisuals(2, !!jsonPayload.pad2);
+                        if (jsonPayload.hasOwnProperty('pad3')) updatePadVisuals(3, !!jsonPayload.pad3);
+
+                        // Render nilai ke halaman
+                        document.getElementById('telemetryVolts').innerHTML = `${volts.toFixed(2)} <span class="text-xs text-cyan-400">V</span>`;
+                        document.getElementById('telemetryAmps').innerHTML = `${amps.toFixed(2)} <span class="text-xs text-cyan-400">A</span>`;
+                        document.getElementById('telemetryWatts').innerHTML = `${watts.toFixed(2)} <span class="text-xs text-brand-500">W</span>`;
+                        document.getElementById('telemetryEff').innerHTML = `${eff.toFixed(1)} <span class="text-xs text-emerald-400">%</span>`;
+                        document.getElementById('telemetryTemp').innerHTML = `${temp.toFixed(1)} <span class="text-xs">°C</span>`;
+
+                        // Sinkronkan ke layar TFT Lokal
+                        updateLocalTFT(volts, amps, watts, temp);
+
+                        // Kelola Kecepatan Kipas sesuai suhu sirkuit ESP32 riil secara selective
+                        controlFansBasedOnTemp(temp);
+
+                        // Alert indikator keselamatan suhu
+                        const badge = document.getElementById('thermalStatusBadge');
+                        if (temp < 35) {
+                            badge.innerText = "STATUS: AMAN";
+                            badge.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20";
+                        } else if (temp < 50) {
+                            badge.innerText = "STATUS: HANGAT";
+                            badge.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20";
+                        } else {
+                            badge.innerText = "STATUS: PANAS";
+                            badge.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-500/15 text-red-400 border border-red-500/20 animate-pulse";
+                        }
+
+                        updateLiveChart(watts, temp);
+
+                    } catch (e) {
+                        logToTerminal(`[MQTT] Error parsing JSON data: ${e.message}`, "error");
+                    }
+                });
+
+                mqttClient.on('error', (err) => {
+                    logToTerminal(`[MQTT] Connection Error: ${err.message}`, "error");
+                    document.getElementById('terminalStatusDot').className = "h-2 w-2 rounded-full bg-red-500 mr-2";
+                });
+
+                mqttClient.on('close', () => {
+                    logToTerminal("[MQTT] Client connection closed.", "warn");
+                    document.getElementById('terminalStatusDot').className = "h-2 w-2 rounded-full bg-red-500 mr-2";
+                });
+
+            } catch (err) {
+                logToTerminal(`[MQTT] Execution failed: ${err.message}`, "error");
+            }
+        }
+
+        // Reconnect helper dari tombol
+        function reconnectMQTTReal() {
+            if (operationMode !== 'live') {
+                switchOperationMode('live');
+            } else {
+                connectMQTTReal();
+            }
+        }
+
+        // Sinkronisasi status visual pad untuk MQTT
+        function updatePadVisuals(padNum, statusActive) {
+            padStates[padNum].active = statusActive;
+            const padEl = document.getElementById(`pad${padNum}`);
+            const phoneVis = document.getElementById(`phoneVisual${padNum}`);
+            const btn = document.getElementById(`btnAction${padNum}`);
+            const wave = document.getElementById(`coilWave${padNum}`);
+
+            if (statusActive) {
+                padEl.classList.remove('border-slate-800');
+                padEl.classList.add('border-cyan-500', 'bg-slate-900/90');
+                phoneVis.classList.remove('opacity-30', 'scale-90');
+                phoneVis.classList.add('opacity-100', 'scale-100');
+                btn.innerText = "Terpasang (MQTT)";
+                btn.className = "w-full py-1 px-2 bg-emerald-600/20 text-emerald-400 rounded-lg text-[11px] font-semibold cursor-not-allowed border border-emerald-500/20";
+                wave.classList.remove('hidden');
+            } else {
+                padEl.classList.add('border-slate-800');
+                padEl.classList.remove('border-cyan-500', 'bg-slate-900/90');
+                phoneVis.classList.add('opacity-30', 'scale-90');
+                phoneVis.classList.remove('opacity-100', 'scale-100');
+                btn.innerText = "Kosong";
+                btn.className = "w-full py-1 px-2 bg-slate-850 text-slate-500 rounded-lg text-[11px] font-semibold cursor-not-allowed";
+                wave.classList.add('hidden');
+            }
+        }
+
+        // Memperbarui layar TFT lokal di box alat simulasi
+        function updateLocalTFT(v, a, w, temp) {
+            document.getElementById('tftVolts').innerText = v.toFixed(2);
+            document.getElementById('tftAmps').innerText = a.toFixed(2);
+            document.getElementById('tftWatts').innerText = w.toFixed(2);
+            document.getElementById('tftTemp').innerText = temp.toFixed(1);
+        }
+
+        // Mengatur animasi kipas berdasarkan pad yang aktif (Selective Cooling) sesuai permintaan pengguna
+        function controlFansBasedOnTemp(temp) {
+            const fans = {
+                1: document.getElementById('fanIcon1'),
+                2: document.getElementById('fanIcon2'),
+                3: document.getElementById('fanIcon3')
+            };
+
+            for (let i = 1; i <= 3; i++) {
+                const fan = fans[i];
+                if (!fan) continue;
+
+                if (padStates[i].active) {
+                    // Kipas berputar jika Pad pasangannya aktif mengisi daya
+                    if (temp > 45) {
+                        fan.className = "text-xl text-cyan-400 animate-fan-fast";
+                    } else if (temp > 32) {
+                        fan.className = "text-xl text-slate-400 animate-fan-slow";
+                    } else {
+                        // Putaran pelan standby saat hangat kuku
+                        fan.className = "text-xl text-slate-500 animate-fan-slow opacity-75";
+                    }
+                } else {
+                    // Kipas dimatikan sepenuhnya jika Pad kosong / tidak dipakai
+                    fan.className = "text-xl text-slate-600";
+                }
             }
         }
 
@@ -700,10 +1099,72 @@
                 logToTerminal("[COIL] Selective Coil Activation DISABLED. All transmitter pads continuously energized.", 'warn');
                 playHapticBeep(400, 0.15);
             }
-            calculateSimulator();
+            if (operationMode === 'sim') calculateSimulator();
+        }
+
+        // TANGANI CONFIG TUNING AUTO VS MANUAL
+        function setTuningMode(isAuto) {
+            autoTuningMode = isAuto;
+            const btnAuto = document.getElementById('btnAutoTune');
+            const btnManual = document.getElementById('btnManualTune');
+            const slider = document.getElementById('freqSlider');
+            const explanation = document.getElementById('tunerExplanation');
+
+            if (isAuto) {
+                btnAuto.className = "px-4 py-1.5 rounded-lg font-bold font-mono uppercase bg-emerald-600 text-white transition-all";
+                btnManual.className = "px-4 py-1.5 rounded-lg font-bold font-mono uppercase text-slate-400 hover:text-slate-200 transition-all";
+                slider.disabled = true;
+                slider.classList.add('opacity-50', 'cursor-not-allowed');
+                explanation.innerHTML = "Sistem sedang beroperasi pada mode **Auto-Tuning**. Saat HP diletakkan, koil transmitter akan menyesuaikan frekuensi secara otomatis hingga resonansi mengunci di 145 kHz.";
+                logToTerminal("[TUNER] Auto-Tuning active. Resonant frequencies will auto-align to optimal 145 kHz.", 'success');
+                playHapticBeep(650, 0.12);
+                
+                // Trigger auto alignment ke 145 kHz jika ada HP yang diletakkan
+                runAutoTuningSequence();
+            } else {
+                btnManual.className = "px-4 py-1.5 rounded-lg font-bold font-mono uppercase bg-cyan-600 text-slate-950 transition-all";
+                btnAuto.className = "px-4 py-1.5 rounded-lg font-bold font-mono uppercase text-slate-400 hover:text-slate-200 transition-all";
+                slider.disabled = false;
+                slider.classList.remove('opacity-50', 'cursor-not-allowed');
+                explanation.innerHTML = "Sistem berada dalam mode **Manual Slider**. Anda dapat menggeser frekuensi driver secara manual untuk menguji efek *mismatch* resonansi.";
+                logToTerminal("[TUNER] Manual tuning activated. Use the slider to set custom frequency.", 'warn');
+                playHapticBeep(450, 0.12);
+            }
+        }
+
+        // Simulasi animasi pencarian frekuensi otomatis standar Qi (Auto-Tuning)
+        function runAutoTuningSequence() {
+            let activePads = 0;
+            for (let k in padStates) {
+                if (padStates[k].active) activePads++;
+            }
+
+            if (activePads > 0 && autoTuningMode) {
+                logToTerminal("[TUNER] Handshake detected. Sweeping frequencies to establish resonant link...", 'info');
+                const targetFreq = 145;
+                const step = resonantFreq < targetFreq ? 1 : -1;
+                
+                let tuneInterval = setInterval(() => {
+                    if (!autoTuningMode || activePads === 0) {
+                        clearInterval(tuneInterval);
+                        return;
+                    }
+                    if (resonantFreq !== targetFreq) {
+                        resonantFreq += step;
+                        document.getElementById('freqSlider').value = resonantFreq;
+                        drawResonantWaves();
+                    } else {
+                        clearInterval(tuneInterval);
+                        logToTerminal("[TUNER] Resonance Lock achieved at 145.0 kHz! Optimal flux established.", 'success');
+                        playHapticBeep(880, 0.1);
+                    }
+                }, 20);
+            }
         }
 
         function togglePhonePlacement(padNum) {
+            if (operationMode !== 'sim') return; // Kunci jika sedang di mode MQTT live
+
             padStates[padNum].active = !padStates[padNum].active;
             
             const padEl = document.getElementById(`pad${padNum}`);
@@ -712,23 +1173,27 @@
             const wave = document.getElementById(`coilWave${padNum}`);
 
             if (padStates[padNum].active) {
-                padEl.classList.remove('border-slate-700');
+                padEl.classList.remove('border-slate-800');
                 padEl.classList.add('border-cyan-500', 'bg-slate-900/90');
-                phoneVis.classList.remove('opacity-40', 'scale-90');
+                phoneVis.classList.remove('opacity-30', 'scale-90');
                 phoneVis.classList.add('opacity-100', 'scale-100');
                 btn.innerText = "Ambil HP";
-                btn.className = "w-full py-1.5 px-3 bg-red-600/20 hover:bg-red-600/40 text-red-400 hover:text-white rounded-lg text-xs font-semibold transition-all border border-red-500/20";
+                btn.className = "w-full py-1 px-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 hover:text-white rounded-lg text-[11px] font-semibold transition-all border border-red-500/20";
                 wave.classList.remove('hidden');
                 
                 logToTerminal(`[WPT] Device coupled successfully on Pad ${padNum === 1 ? 'A' : padNum === 2 ? 'B' : 'C'}. Brand: ${padStates[padNum].brand}`, 'success');
                 playHapticBeep(523.25, 0.25); // Beep high pitch (success)
+                
+                if (autoTuningMode) {
+                    runAutoTuningSequence();
+                }
             } else {
-                padEl.classList.add('border-slate-700');
+                padEl.classList.add('border-slate-800');
                 padEl.classList.remove('border-cyan-500', 'bg-slate-900/90');
-                phoneVis.classList.add('opacity-40', 'scale-90');
+                phoneVis.classList.add('opacity-30', 'scale-90');
                 phoneVis.classList.remove('opacity-100', 'scale-100');
                 btn.innerText = "Letakkan HP";
-                btn.className = "w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition-all";
+                btn.className = "w-full py-1 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-[11px] font-semibold transition-all";
                 wave.classList.add('hidden');
                 
                 logToTerminal(`[WPT] Device uncoupled from Pad ${padNum === 1 ? 'A' : padNum === 2 ? 'B' : 'C'}.`, 'warn');
@@ -738,7 +1203,22 @@
             calculateSimulator();
         }
 
+        // PENYETELAN MANUAL DARI SLIDER
+        function manualTuningAdjust() {
+            const slider = document.getElementById('freqSlider');
+            resonantFreq = parseInt(slider.value);
+            drawResonantWaves();
+        }
+
+        // Generator Fluktuasi Ringan (Sesuai Kebutuhan Demonstrasi Realistis)
+        function getNoise(range) {
+            return (Math.random() - 0.5) * range;
+        }
+
+        // OFFLINE SIMULATION MATHEMATICAL ENGINE WITH DYNAMIC NOISE
         function calculateSimulator() {
+            if (operationMode !== 'sim') return;
+
             const alignmentInput = document.getElementById('sliderAlignment');
             alignmentFactor = parseInt(alignmentInput.value);
             document.getElementById('alignmentVal').innerText = `${alignmentFactor}% ${alignmentFactor == 100 ? '(Sempurna)' : alignmentFactor > 80 ? '(Sangat Bagus)' : alignmentFactor > 50 ? '(Cukup)' : '(Buruk)'}`;
@@ -748,65 +1228,89 @@
                 if (padStates[k].active) activePads++;
             }
 
-            // Algoritma Power Sharing
-            let basePowerPerPhone = 0;
-            if (activePads === 1) {
-                basePowerPerPhone = 15;
-            } else if (activePads === 2) {
-                basePowerPerPhone = 15;
-            } else if (activePads === 3) {
-                basePowerPerPhone = 15;
-            }
+            // Alokasi Daya Perangkat (Maks 15W per slot)
+            let basePowerPerPhone = activePads > 0 ? 15 : 0;
 
-            // Hitung pengaruh tuning frekuensi ke efisiensi (Resonance lock at 145 kHz)
+            // Pengaruh Driver Frequency Tuning terhadap Efisiensi Link
             let freqDistance = Math.abs(resonantFreq - 145);
-            let freqEfficiencyFactor = Math.max(0.1, 1 - (freqDistance / 60)); // Peak resonance multiplier
+            let freqEfficiencyFactor = Math.max(0.1, 1 - (freqDistance / 60));
 
             const peakCouplingEfficiency = 0.85; 
-            const realEfficiency = peakCouplingEfficiency * (alignmentFactor / 100) * freqEfficiencyFactor;
+            baseEff = activePads > 0 ? (peakCouplingEfficiency * (alignmentFactor / 100) * freqEfficiencyFactor) : 0;
 
-            let totalPowerDraw = 0;
-            for (let k in padStates) {
-                if (padStates[k].active) {
-                    totalPowerDraw += basePowerPerPhone;
-                }
-            }
+            let totalPowerDraw = activePads * basePowerPerPhone;
+            baseWatts = totalPowerDraw > 0 ? (totalPowerDraw / baseEff) : (selectiveCoilFeature ? 0.5 : 4.5);
 
-            let systemInputPower = totalPowerDraw / realEfficiency;
-            if (activePads === 0) systemInputPower = selectiveCoilFeature ? 0.5 : 4.5;
+            baseVolts = 12.00;
+            baseAmps = baseWatts / baseVolts;
 
-            let inputVoltage = 12.0;
-            let inputCurrent = systemInputPower / inputVoltage;
-
-            document.getElementById('telemetryVolts').innerHTML = `${inputVoltage.toFixed(2)} <span class="text-xs text-cyan-400">V</span>`;
-            document.getElementById('telemetryAmps').innerHTML = `${inputCurrent.toFixed(2)} <span class="text-xs text-cyan-400">A</span>`;
-            document.getElementById('telemetryWatts').innerHTML = `${systemInputPower.toFixed(2)} <span class="text-xs text-brand-500">W</span>`;
-            document.getElementById('telemetryEff').innerHTML = `${activePads > 0 ? (realEfficiency * 100).toFixed(1) : '0.0'} <span class="text-xs text-emerald-400">%</span>`;
-
-            let heatDissipationFactor = (systemInputPower - totalPowerDraw);
+            // Perhitungan Rugi-rugi Daya Panas
+            let heatDissipationFactor = baseWatts - totalPowerDraw;
             if (!selectiveCoilFeature && activePads < 3) {
                 heatDissipationFactor += (3 - activePads) * 1.5; 
             }
-            let calculatedTemperature = 30.2 + (heatDissipationFactor * 0.8);
-            if (activePads === 0) calculatedTemperature = 28.5;
+            baseTemp = 28.50 + (activePads > 0 ? (heatDissipationFactor * 0.8) : 0);
 
-            document.getElementById('telemetryTemp').innerHTML = `${calculatedTemperature.toFixed(1)} <span class="text-xs">°C</span>`;
+            renderTelemetryUpdate();
+        }
 
+        // Memperbarui UI & Layar TFT Dengan Menambahkan Mikro Fluktuasi Sensor
+        function renderTelemetryUpdate() {
+            if (operationMode !== 'sim') return;
+
+            let activePads = 0;
+            for (let k in padStates) {
+                if (padStates[k].active) activePads++;
+            }
+
+            // Tambahkan gangguan fluktuatif (live noise) sensor analog
+            let noiseV = getNoise(0.06); 
+            let noiseA = activePads > 0 ? getNoise(0.02) : getNoise(0.002);
+            let noiseW = activePads > 0 ? getNoise(0.25) : getNoise(0.03);
+            let noiseT = activePads > 0 ? getNoise(0.15) : getNoise(0.04);
+            let noiseE = activePads > 0 ? getNoise(0.4) : 0;
+
+            let displayV = Math.max(0, baseVolts + noiseV);
+            let displayA = Math.max(0, baseAmps + noiseA);
+            let displayW = Math.max(0, baseWatts + noiseW);
+            let displayT = Math.max(25.0, baseTemp + noiseT);
+            let displayE = Math.max(0, (baseEff * 100) + noiseE);
+
+            // Render ke panel utama
+            document.getElementById('telemetryVolts').innerHTML = `${displayV.toFixed(2)} <span class="text-xs text-cyan-400">V</span>`;
+            document.getElementById('telemetryAmps').innerHTML = `${displayA.toFixed(2)} <span class="text-xs text-cyan-400">A</span>`;
+            document.getElementById('telemetryWatts').innerHTML = `${displayW.toFixed(2)} <span class="text-xs text-brand-500">W</span>`;
+            document.getElementById('telemetryEff').innerHTML = `${activePads > 0 ? displayE.toFixed(1) : '0.0'} <span class="text-xs text-emerald-400">%</span>`;
+            document.getElementById('telemetryTemp').innerHTML = `${displayT.toFixed(1)} <span class="text-xs">°C</span>`;
+
+            // Sinkronkan ke layar TFT Lokal
+            updateLocalTFT(displayV, displayA, displayW, displayT);
+
+            // Kelola kipas depan stasiun charger secara selective berdasarkan pad yang sedang digunakan
+            controlFansBasedOnTemp(displayT);
+
+            // Perbarui indikator suhu
             const badge = document.getElementById('thermalStatusBadge');
-            if (calculatedTemperature < 40) {
+            if (displayT < 35) {
                 badge.innerText = "STATUS: AMAN";
                 badge.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20";
-            } else if (calculatedTemperature < 55) {
+            } else if (displayT < 50) {
                 badge.innerText = "STATUS: HANGAT";
                 badge.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20";
             } else {
                 badge.innerText = "STATUS: PANAS";
                 badge.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-500/15 text-red-400 border border-red-500/20 animate-pulse";
-                logToTerminal("[WARNING] Thermal safety threshold exceeded! Overheat risk.", 'error');
             }
 
-            updateLiveChart(systemInputPower, calculatedTemperature);
+            updateLiveChart(displayW, displayT);
         }
+
+        // Loop Fluktuasi Telemetri Simulasi Secara Berkala
+        setInterval(() => {
+            if (operationMode === 'sim') {
+                renderTelemetryUpdate();
+            }
+        }, 700);
 
         function initChart() {
             const ctx = document.getElementById('telemetryChart').getContext('2d');
@@ -887,9 +1391,8 @@
             waveCanvas.height = 220;
         }
 
+        // Memeriksa tuning gelombang frekuensi
         function drawResonantWaves() {
-            const slider = document.getElementById('freqSlider');
-            resonantFreq = parseInt(slider.value);
             document.getElementById('freqVal').innerText = `${resonantFreq} kHz`;
 
             const freqDistance = Math.abs(resonantFreq - 145);
@@ -906,7 +1409,7 @@
                 statusEl.className = "text-red-400 font-bold font-mono";
             }
 
-            calculateSimulator();
+            if (operationMode === 'sim') calculateSimulator();
         }
 
         function animateWave() {
@@ -917,7 +1420,6 @@
             const height = waveCanvas.height;
             const midY = height / 2;
 
-            // Target resonansi optimal 145 kHz
             const freqDistance = Math.abs(resonantFreq - 145);
             const resonanceRatio = Math.max(0.1, 1 - (freqDistance / 60)); // Peak resonance visual
 
@@ -932,12 +1434,11 @@
             }
             waveCtx.stroke();
 
-            // 2. Gambar Gelombang Receiver (Cyan) - Amplified based on resonance ratio
+            // 2. Gambar Gelombang Receiver (Cyan)
             waveCtx.beginPath();
             waveCtx.strokeStyle = `rgba(34, 211, 238, ${Math.min(1, resonanceRatio + 0.15)})`;
             waveCtx.lineWidth = 2 + (resonanceRatio * 3);
             for (let x = 0; x < width; x++) {
-                // Gelombang sefase (In-phase resonance lock)
                 const phaseOffset = (freqDistance < 5) ? wavePhase : wavePhase * 1.5;
                 const amplitude = 5 + (resonanceRatio * 45); 
                 const y = midY + 20 + Math.sin((x / 30) + phaseOffset) * amplitude;
@@ -967,21 +1468,31 @@
         function switchTab(tabId) {
             const el1Content = document.getElementById('tabContent-el1');
             const el2Content = document.getElementById('tabContent-el2');
+            const el3Content = document.getElementById('tabContent-el3');
             const el1Btn = document.getElementById('tabBtn-el1');
             const el2Btn = document.getElementById('tabBtn-el2');
+            const el3Btn = document.getElementById('tabBtn-el3');
+
+            el1Content.classList.add('hidden');
+            el2Content.classList.add('hidden');
+            el3Content.classList.add('hidden');
+            
+            el1Btn.className = "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200";
+            el2Btn.className = "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200";
+            el3Btn.className = "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200";
 
             if(tabId === 'el1') {
                 el1Content.classList.remove('hidden');
-                el2Content.classList.add('hidden');
-                el1Btn.className = "px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md";
-                el2Btn.className = "px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200";
-                logToTerminal("[DOC] Loaded Usulan Proyek (EL-1 Rev 1.pdf) Summary Slide.");
-            } else {
+                el1Btn.className = "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md";
+                logToTerminal("[DOC] Loaded Usulan Proyek (EL-1 Rev 1) Summary.");
+            } else if(tabId === 'el2') {
                 el2Content.classList.remove('hidden');
-                el1Content.classList.add('hidden');
-                el2Btn.className = "px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md";
-                el1Btn.className = "px-5 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-slate-200";
-                logToTerminal("[DOC] Loaded Kajian & Standar (EL 2 Rev.pdf) Summary Slide.");
+                el2Btn.className = "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md";
+                logToTerminal("[DOC] Loaded Kajian & Standar (EL-2 Rev) Summary.");
+            } else {
+                el3Content.classList.remove('hidden');
+                el3Btn.className = "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-md";
+                logToTerminal("[DOC] Loaded Desain Perancangan & Pengujian Alat (EL-3 Rev) Summary.");
             }
         }
 
@@ -994,22 +1505,8 @@
 
             window.addEventListener('resize', resizeWaveCanvas);
 
-            // Loop untuk log simulator ESP32 acak agar terminal terlihat hidup
-            setInterval(() => {
-                let activePads = 0;
-                for (let k in padStates) {
-                    if (padStates[k].active) activePads++;
-                }
-
-                if (activePads > 0) {
-                    const rand = Math.random();
-                    if (rand < 0.3) {
-                        logToTerminal(`[MQTT] Publish payload: {"watts": ${(document.getElementById('telemetryWatts').innerText)}, "eff": "${document.getElementById('telemetryEff').innerText}"}`, 'info');
-                    } else if (rand < 0.5) {
-                        logToTerminal(`[ADC] Coil status reads normal. Overheat: safe.`, 'success');
-                    }
-                }
-            }, 5000);
+            // Trigger status connect serial monitor di awal
+            document.getElementById('terminalStatusDot').className = "h-2 w-2 rounded-full bg-cyan-400 mr-2 animate-pulse";
         }
     </script>
 </body>
